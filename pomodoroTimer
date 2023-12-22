@@ -1,6 +1,9 @@
 from logging import root
 import tkinter as tk
 import time
+from winsound import PlaySound
+from playsound import playsound
+
 
 # Define a global variable to track the timer state
 timer_running = False
@@ -32,10 +35,10 @@ def start_timer():
 
         # Check if the timer has reached 0
         if seconds == 0:
-            enable_buttons()
-            label.config(text=f"Time finished!")
-            playsound('C:/Users/Richard/Desktop/Github/Pomodoro/beep-07.mp3')
-            break
+                enable_buttons()
+                label.config(text=f"Time finished!")
+                playsound('C:/Users/Richard/Desktop/Github/Pomodoro/audio/notification.mp3')
+                break
     
     # Enable the start button after the timer ends or is stopped
     enable_buttons()
@@ -64,7 +67,7 @@ def set_timer(option):
         entry.insert(0, 25)
     elif option == "short_break":
         entry.delete(0, tk.END) 
-        entry.insert(0, 1)
+        entry.insert(0, 5)
     elif option == "long_break":
         entry.delete(0, tk.END) 
         entry.insert(0, 15)
