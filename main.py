@@ -19,7 +19,7 @@ class PomodoroTimer:
         menu_bar.add_cascade(label="Settings", menu=file_menu)
         file_menu.add_separator()
         file_menu.add_command(label="Edit Pomodoro Timer", command="")
-        file_menu.add_command(label="What is pomodoro?", command="")
+        file_menu.add_command(label="What is pomodoro?", command=self.open_what_is_pomodoro)
 
     def create_widgets(self):
         self.entry = tk.Entry(self.window)
@@ -50,7 +50,19 @@ class PomodoroTimer:
         seconds = minutes * 60
         self.disable_buttons()
         self.timer_running = True
-
+        
+    def open_what_is_pomodoro(self):
+        WhatIsPomodoro(self.window)
+        
+    def open_what_is_pomodoro(self):
+        EditPomodoroTimer(self.window)
+        
+    def start_timer(self):
+        minutes = int(self.entry.get())
+        seconds = minutes * 60
+        self.disable_buttons()
+        self.timer_running = True
+        
         while seconds >= 0 and self.timer_running:
             self.label.config(text=f"Time remaining: {seconds // 60}:{seconds % 60:02d}")
             self.label.update()
@@ -84,6 +96,20 @@ class PomodoroTimer:
 
     def run(self):
         self.window.mainloop()
+ 
+
+class WhatIsPomodoro:
+    def __init__(self, parent):
+        self.window = tk.Toplevel(parent)
+        self.window.title("What is Pomodoro?")
+        
+        # Add content to the new window as needed
+        
+
+class EditPomodoroTimer:
+    def __init__(self, parent):
+        self.window = tk.Toplevel(parent)
+        self.window.title("Edit Pomodoro Timer")
 
 if __name__ == "__main__":
     timer = PomodoroTimer()
