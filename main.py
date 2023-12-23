@@ -127,7 +127,9 @@ class HowToPomodoro:
         - Work on task until timer is complete
         - Take a 5 minutes short break
         - After four "Pomodoro" take a long break
-        - Repeat to step 1"""
+        - Repeat to step 1
+        
+        Final Result: You have worked for 100 minutes and took 15 minutes break"""
         self.text_box.insert(tk.END, text)
         self.text_box.pack()
 

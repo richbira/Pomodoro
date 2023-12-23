@@ -7,17 +7,7 @@ How to become more productive
 
 ```
 
-Install Playsound:
-```bash
-  pip install playsound
-
-```
-
-open cmd and run:
-```bash
-  python main.py
-
-```
+You can now open the Tomato Timer on "dist" folder and open the main.exe!
 
 # How to use Pomodoro/ Tomato timers
 - Decide task to be done set timers to 25 minutes for one "Pomodoro"
@@ -25,6 +15,11 @@ open cmd and run:
 - Take a 5 minutes short break
 - After four "Pomodoro" take a long break
 - Repeat to step 1
+
+- Final Result: You have worked for 100 minutes and took 15 minutes break!
+
+PS: There is also a motivational quote that will help you on being productive! :)
+
 
 Language used : Python
 Library tkinter — Python interface to Tcl/Tk
