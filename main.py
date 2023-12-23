@@ -18,8 +18,9 @@ class PomodoroTimer:
         file_menu = tk.Menu(menu_bar, tearoff=0)
         menu_bar.add_cascade(label="Settings", menu=file_menu)
         file_menu.add_separator()
-        file_menu.add_command(label="Edit Pomodoro Timer", command="")
+        file_menu.add_command(label="Edit Pomodoro Timer", command=self.open_edit_pomodoro)
         file_menu.add_command(label="What is pomodoro?", command=self.open_what_is_pomodoro)
+        file_menu.add_command(label="How to use pomodoro timer", command=self.open_how_pomodoro)
 
     def create_widgets(self):
         self.entry = tk.Entry(self.window)
@@ -54,8 +55,11 @@ class PomodoroTimer:
     def open_what_is_pomodoro(self):
         WhatIsPomodoro(self.window)
         
-    def open_what_is_pomodoro(self):
+    def open_edit_pomodoro(self):
         EditPomodoroTimer(self.window)
+        
+    def open_how_pomodoro(self):
+        HowToPomodoro(self.window)
         
     def start_timer(self):
         minutes = int(self.entry.get())
@@ -102,14 +106,30 @@ class WhatIsPomodoro:
     def __init__(self, parent):
         self.window = tk.Toplevel(parent)
         self.window.title("What is Pomodoro?")
-        
         # Add content to the new window as needed
+        self.text_box = tk.Text(self.window, height=10, width=50)
+        self.text_box.insert(tk.END, "The Pomodoro Technique is a time management method that uses a timer to break work into intervals, traditionally 25 minutes in length, separated by short breaks. It is named after the tomato-shaped kitchen timer that was used by the creator of this technique. The technique aims to improve productivity by reducing distractions and promoting focus and concentration.")
+        self.text_box.pack()
         
 
 class EditPomodoroTimer:
     def __init__(self, parent):
         self.window = tk.Toplevel(parent)
         self.window.title("Edit Pomodoro Timer")
+        
+class HowToPomodoro:
+    def __init__(self, parent):
+        self.window = tk.Toplevel(parent)
+        self.window.title("Edit Pomodoro Timer")
+        self.text_box = tk.Text(self.window, height=10, width=50)
+        text = """
+        - Decide task to be done set timers to 25 minutes for one "Pomodoro"
+        - Work on task until timer is complete
+        - Take a 5 minutes short break
+        - After four "Pomodoro" take a long break
+        - Repeat to step 1"""
+        self.text_box.insert(tk.END, text)
+        self.text_box.pack()
 
 if __name__ == "__main__":
     timer = PomodoroTimer()
