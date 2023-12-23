@@ -1,126 +1,116 @@
-from logging import root
+from playsound import playsound
 import tkinter as tk
 import time
-from winsound import PlaySound
 from playsound import playsound
 
+class PomodoroTimer:
+    def __init__(self):
+        self.timer_running = False
+        self.window = tk.Tk()
+        self.window.title("Tomato Timer")
+        self.window.geometry("500x200")
+        self.create_menu()
+        self.create_widgets()
 
-# Define a global variable to track the timer state
-global timer_running
+    def create_menu(self):
+        menu_bar = tk.Menu(self.window)
+        self.window.config(menu=menu_bar)
+        file_menu = tk.Menu(menu_bar, tearoff=0)
+        menu_bar.add_cascade(label="Settings", menu=file_menu)
+        file_menu.add_separator()
+        file_menu.add_command(label="Edit Pomodoro Timer", command="")
+        file_menu.add_command(label="What is pomodoro?", command=self.open_what_is_pomodoro)
 
-def start_timer():
-    
-    # Get the time in minutes from the user
-    minutes = int(entry.get())
-    seconds = minutes * 60
+    def create_widgets(self):
+        self.entry = tk.Entry(self.window)
+        self.entry.pack()
+        self.label = tk.Label(self.window, text="Time remaining:")
+        self.label.pack()
+        self.text_box = tk.Text(self.window, height=3, width=40)
+        self.text_box.insert(tk.END, "You don’t have to be great to start, but you have to start to be great.")
+        self.text_box.pack()
+        
+        self.pomodoro_button = tk.Button(self.window, text="Pomodoro", command=lambda: self.set_timer(25))
+        self.pomodoro_button.pack(side="left", padx=5)
+        self.short_break_button = tk.Button(self.window, text="Short Break", command=lambda: self.set_timer(5))
+        self.short_break_button.pack(side="left", padx=5)
+        self.long_break_button = tk.Button(self.window, text="Long Break", command=lambda: self.set_timer(15))
+        self.long_break_button.pack(side="left", padx=5)
+        self.start_button = tk.Button(self.window, text="Start", command=self.start_timer)
+        self.start_button.pack(side="left", padx=5)
+        self.stop_button = tk.Button(self.window, text="Stop", command=self.stop_timer)
+        self.stop_button.pack(side="left", padx=5)
 
-    # Disable the start button
-    disable_buttons()
-    
-    # Set the timer state to running
-    timer_running = True
+    def set_timer(self, minutes):
+        self.entry.delete(0, tk.END)
+        self.entry.insert(0, minutes)
 
-    # Start the timer
-    while seconds >= 0 and timer_running:
-        # Update the label with the remaining time
-        label.config(text=f"Time remaining: {seconds // 60}:{seconds % 60:02d}")
-        label.update()
+    def start_timer(self):
+        minutes = int(self.entry.get())
+        seconds = minutes * 60
+        self.disable_buttons()
+        self.timer_running = True
+        
+    def open_what_is_pomodoro(self):
+        WhatIsPomodoro(self.window)
+        
+    def open_what_is_pomodoro(self):
+        EditPomodoroTimer(self.window)
+        
+    def start_timer(self):
+        minutes = int(self.entry.get())
+        seconds = minutes * 60
+        self.disable_buttons()
+        self.timer_running = True
+        
+        while seconds >= 0 and self.timer_running:
+            self.label.config(text=f"Time remaining: {seconds // 60}:{seconds % 60:02d}")
+            self.label.update()
+            time.sleep(1)
+            seconds -= 1
 
-        # Wait for 1 second
-        time.sleep(1)
-
-        # Decrease the remaining time
-        seconds -= 1
-
-        # Check if the timer has reached 0
-        if seconds == 0:
-                enable_buttons()
-                label.config(text=f"Time finished!")
+            if seconds == 0:
+                self.enable_buttons()
+                self.label.config(text="Time finished!")
                 playsound('C:/Users/Richard/Desktop/Github/Pomodoro/audio/notification.mp3')
                 break
-    
-    # Enable the start button after the timer ends or is stopped
-    enable_buttons()
-    
-def stop_timer():
-    enable_buttons()
-    # Set the timer state to not running
-    timer_running = False
 
-def enable_buttons():
-    pomodoro.config(state=tk.NORMAL)
-    long_break_button.config(state=tk.NORMAL)
-    short_break_button.config(state=tk.NORMAL)
-    start_button.config(state=tk.NORMAL)
+        self.enable_buttons()
 
-def disable_buttons():
-    pomodoro.config(state=tk.DISABLED)
-    long_break_button.config(state=tk.DISABLED)
-    short_break_button.config(state=tk.DISABLED)
-    start_button.config(state=tk.DISABLED)
+    def stop_timer(self):
+        self.enable_buttons()
+        self.timer_running = False
 
-def set_timer(option):
-    if option == "pomodoro":
-        entry.delete(0, tk.END) 
-        entry.insert(0, 25)
-    elif option == "short_break":
-        entry.delete(0, tk.END) 
-        entry.insert(0, 5)
-    elif option == "long_break":
-        entry.delete(0, tk.END) 
-        entry.insert(0, 15)
+    def enable_buttons(self):
+        self.pomodoro_button.config(state=tk.NORMAL)
+        self.long_break_button.config(state=tk.NORMAL)
+        self.short_break_button.config(state=tk.NORMAL)
+        self.start_button.config(state=tk.NORMAL)
+        self.stop_button.config(state=tk.NORMAL)
 
-# Create the main window
+    def disable_buttons(self):
+        self.pomodoro_button.config(state=tk.DISABLED)
+        self.long_break_button.config(state=tk.DISABLED)
+        self.short_break_button.config(state=tk.DISABLED)
+        self.start_button.config(state=tk.DISABLED)
 
-window = tk.Tk()
-window.title("Tomato Timer")
-window.geometry("500x200")
+    def run(self):
+        self.window.mainloop()
+ 
 
-# Create a menu bar
-menu_bar = tk.Menu(window)
-window.config(menu=menu_bar)
+class WhatIsPomodoro:
+    def __init__(self, parent):
+        self.window = tk.Toplevel(parent)
+        self.window.title("What is Pomodoro?")
+        
+        # Add content to the new window as needed
+        
 
-# Create a File menu
-file_menu = tk.Menu(menu_bar, tearoff=0)
-menu_bar.add_cascade(label="Settings", menu=file_menu)
-file_menu.add_separator()
-file_menu.add_command(label="Edit Pomodoro Timer", command="")
-file_menu.add_command(label="What is pomodoro?", command="")
+class EditPomodoroTimer:
+    def __init__(self, parent):
+        self.window = tk.Toplevel(parent)
+        self.window.title("Edit Pomodoro Timer")
 
-# Create an entry field for the user to input the time in minutes
-entry = tk.Entry(window)
-entry.pack()
-
-# Create a label to display the remaining time
-label = tk.Label(window, text="Time remaining:")
-label.pack()
-
-# Create a text box for additional notes
-text_box = tk.Text(window, height=3, width=40)
-default_value = "You don’t have to be great to start, but you have to start to be great."
-text_box.insert("1.0", default_value) 
-text_box.pack()
-
-# Update the pomodoro command to call set_timer with "pomodoro" option
-pomodoro = tk.Button(window, text="Pomodoro", command=lambda: set_timer("pomodoro"))
-pomodoro.pack(side="left", padx=5)
-
-# Create a short break button
-short_break_button = tk.Button(window, text="Short Break", command=lambda: set_timer("short_break"))
-short_break_button.pack(side="left", padx=5)
-
-# Create a long break button
-long_break_button = tk.Button(window, text="Long Break", command=lambda: set_timer("long_break"))
-long_break_button.pack(side="left", padx=5)
-
-
-# Button to Start
-start_button = tk.Button(window, text="Start", command=start_timer)
-start_button.pack(side="left", padx=5)
-
-# Button to Stop
-stop_button = tk.Button(window, text="Stop", command=stop_timer)
-stop_button.pack(side="left", padx=5)
-
-# Start the main event loop
-window.mainloop()
+if __name__ == "__main__":
+    timer = PomodoroTimer()
+    timer.run()
