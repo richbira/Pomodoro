@@ -9,6 +9,20 @@ How to become more productive
 
 You can now open the Tomato Timer on "dist" folder and open the main.exe!
 
+Or
+
+Install Playsound:
+```bash
+  pip install playsound
+
+```
+
+open cmd and run:
+```bash
+  python main.py
+
+```
+
 # How to use Pomodoro/ Tomato timers
 - Decide task to be done set timers to 25 minutes for one "Pomodoro"
 - Work on task until timer is complete
