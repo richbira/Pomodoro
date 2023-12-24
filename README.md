@@ -42,5 +42,8 @@ Library tkinter — Python interface to Tcl/Tk
 
 #Want to contribute?
 Contributions are always welcome!
+As I am currently in the process of learning Python, I anticipate encountering challenges while developing the app; however, I am open to and welcome all suggestions.
 
 Feel free to open an issue if you found a bug or want to recommend a feature. Also, PRs are welcome.
+
+
