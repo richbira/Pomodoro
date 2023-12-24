@@ -8,7 +8,7 @@ class PomodoroTimer:
         self.timer_running = False
         self.window = tk.Tk()
         self.window.title("Tomato Timer")
-        self.window.geometry("500x200+660+300")
+        self.window.geometry("500x250+660+300")
         self.window.iconbitmap('./images/logo.ico')
         self.window.resizable(False, False)
         self.create_menu()
@@ -28,6 +28,17 @@ class PomodoroTimer:
     def create_widgets(self):
         self.entry = tk.Entry(self.window)
         self.entry.pack()
+          
+        frame_mode_buttons = tk.Frame(self.window,padx=10, pady=10)
+        frame_mode_buttons.pack()
+        
+        self.pomodoro_button = tk.Button(frame_mode_buttons, text="Pomodoro", command=lambda: self.set_timer(25))
+        self.pomodoro_button.pack(side="left", padx=5)
+        self.short_break_button = tk.Button(frame_mode_buttons, text="Short Break", command=lambda: self.set_timer(5))
+        self.short_break_button.pack(side="left", padx=5)
+        self.long_break_button = tk.Button(frame_mode_buttons, text="Long Break", command=lambda: self.set_timer(15))
+        self.long_break_button.pack(side="left", padx=5)
+        
         self.label = tk.Label(self.window, text="Time remaining:",font=("Helvetica", 14))
         self.label.pack()
         self.text_box = tk.Text(self.window, height=3, width=40)
@@ -39,18 +50,14 @@ class PomodoroTimer:
         
         self.play_photo_ref = play_photo
         self.stop_photo_ref = pause_photo
-        
-        self.pomodoro_button = tk.Button(self.window, text="Pomodoro", command=lambda: self.set_timer(25))
-        self.pomodoro_button.pack(side="left", padx=5)
-        self.short_break_button = tk.Button(self.window, text="Short Break", command=lambda: self.set_timer(5))
-        self.short_break_button.pack(side="left", padx=5)
-        self.long_break_button = tk.Button(self.window, text="Long Break", command=lambda: self.set_timer(15))
-        self.long_break_button.pack(side="left", padx=5)
-        self.start_button = tk.Button(self.window, text="Start", command=self.start_timer,image=play_photo)
+                
+        frame_buttons_time = tk.Frame(self.window,padx=10, pady=10, height=100, width=100)
+        frame_buttons_time.pack()
+        self.start_button = tk.Button(frame_buttons_time, text="Start", command=self.start_timer,image=play_photo)
         self.start_button.pack(side="left", padx=5)
-        self.stop_button = tk.Button(self.window, text="Stop", command=self.stop_timer,image=pause_photo)
-        self.stop_button.pack(side="left", padx=5)
-
+        self.stop_button = tk.Button(frame_buttons_time, text="Stop", command=self.stop_timer,image=pause_photo)
+        self.stop_button.pack(side="left", padx=5)      
+        
     def set_timer(self, minutes):
         self.entry.delete(0, tk.END)
         self.entry.insert(0, minutes)
@@ -110,22 +117,28 @@ class PomodoroTimer:
     def run(self):
         self.window.mainloop()
  
-
 class WhatIsPomodoro:
     def __init__(self, parent):
         self.window = tk.Toplevel(parent)
         self.window.title("What is Pomodoro?")
+        self.window.iconbitmap('./images/logo.ico')
         # Add content to the new window as needed
         self.text_box = tk.Text(self.window, height=10, width=50)
         self.text_box.insert(tk.END, "The Pomodoro Technique is a time management method that uses a timer to break work into intervals, traditionally 25 minutes in length, separated by short breaks. It is named after the tomato-shaped kitchen timer that was used by the creator of this technique. The technique aims to improve productivity by reducing distractions and promoting focus and concentration.")
         self.text_box.pack()
         
-
 class EditPomodoroTimer:
     def __init__(self, parent):
         self.window = tk.Toplevel(parent)
+        self.window.iconbitmap('./images/logo.ico')
         self.window.title("Edit Pomodoro Timer")
         self.window.geometry("500x200+460+350")
+        
+        # Initialize StringVar with default values
+        self.pomodoro_time = tk.StringVar(value="25")
+        self.short_break_time = tk.StringVar(value="5")
+        self.long_break_time = tk.StringVar(value="15")
+        
         self.create_widgets(parent)
         
     def create_widgets(self, parent):
@@ -133,8 +146,9 @@ class EditPomodoroTimer:
         pomodoro_label.pack()
         
         pomodoro_time = tk.StringVar()
+        pomodoro_time = 25
         pomodoro_entry = tk.Entry(self.window,textvariable=pomodoro_time)
-        pomodoro_entry.insert(0, 25)
+        pomodoro_entry.insert(0, pomodoro_time)
         pomodoro_entry.pack(padx=5, pady=5)
         pomodoro_entry.focus()
         
@@ -142,8 +156,9 @@ class EditPomodoroTimer:
         short_break_label.pack()
         
         short_break_time = tk.StringVar()
+        short_break_time = 5
         short_break_entry = tk.Entry(self.window,textvariable=short_break_time)
-        short_break_entry.insert(0, 5)
+        short_break_entry.insert(0, short_break_time)
         short_break_entry.pack(padx=5, pady=5)
         
         long_break_label = tk.Label(self.window, text="Long Break", font=("Helvetica", 12))
@@ -151,21 +166,39 @@ class EditPomodoroTimer:
         
         long_break_time = tk.StringVar()
         long_break_entry = tk.Entry(self.window,textvariable=long_break_time)
-        long_break_entry.insert(0, 15)
+        long_break_time = 15
+        long_break_entry.insert(0, long_break_time)
         long_break_entry.pack(padx=5, pady=5)
         
-        
-        save_button = tk.Button(self.window, text="Save", command=lambda: self.close_window(parent))
+       #save_button = tk.Button(self.window, text="Save", command=lambda: self.save_values(parent))
+        save_button = tk.Button(self.window, text="Save", command=self.save_values)
         save_button.pack()
 
     def close_window(self, parent):
         parent.deiconify()  # Show the main window
         self.window.destroy()  # Close the Toplevel window
+    
+    
+    def save_values(self):
+        # Retrieve the entered values
+        pomodoro_value = int(self.pomodoro_time.get())
+        short_break_value = int(self.short_break_time.get())
+        long_break_value = int(self.long_break_time.get())
+
+        # You can use these values as needed (e.g., save to a file or update settings)
+        print("Pomodoro:", pomodoro_value)
+        print("Short Break:", short_break_value)
+        print("Long Break:", long_break_value)
+
+        # Close the Toplevel window
+        self.window.deiconify()
+        self.window.destroy()
         
 class HowToPomodoro:
     def __init__(self, parent):
         self.window = tk.Toplevel(parent)
         self.window.title("Edit Pomodoro Timer")
+        self.window.iconbitmap('./images/logo.ico')
         self.text_box = tk.Text(self.window, height=10, width=50)
         text = """
         - Decide task to be done set timers to 25 minutes for one "Pomodoro" \n
@@ -181,3 +214,5 @@ class HowToPomodoro:
 if __name__ == "__main__":
     timer = PomodoroTimer()
     timer.run()
+    
+    
