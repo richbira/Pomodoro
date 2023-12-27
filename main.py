@@ -1,22 +1,32 @@
+import configparser
 from playsound import playsound
 import tkinter as tk
 import time
 from playsound import playsound
 from tkinter import *
+from configparser import ConfigParser
 
 class PomodoroTimer:
     def __init__(self):
         self.timer_running = False
+        self.config = ConfigParser()
+        self.config.read("config.ini")  # Load configuration settings
         self.window = tk.Tk()
         self.window.title("Tomato Timer")
         self.window.geometry("500x250+660+300")
         self.window.iconbitmap('./images/logo.ico')
-        self.window.resizable(False, False)
+        self.window.resizable(False, False)        
         self.create_menu()
+        self.get_value_from_file()
         self.create_widgets()
-        global custom_timers
-        custom_timers = None
-        print("MAIN custom_timers: ",custom_timers)
+        
+          
+    def get_value_from_file(self):
+        self.config = ConfigParser()
+        self.config.read("settings/config.ini")
+        self.pomodoro_time = tk.StringVar(value=self.config.get("Settings", "pomodoro_time", fallback="25"))
+        self.short_break_time = tk.StringVar(value=self.config.get("Settings", "short_break_time", fallback="5"))
+        self.long_break_time = tk.StringVar(value=self.config.get("Settings", "long_break_time", fallback="15"))
 
     def create_menu(self):
         menu_bar = tk.Menu(self.window)
@@ -35,11 +45,11 @@ class PomodoroTimer:
         frame_mode_buttons = tk.Frame(self.window,padx=10, pady=10)
         frame_mode_buttons.pack()
         
-        self.pomodoro_button = tk.Button(frame_mode_buttons, text="Pomodoro", command=lambda: self.set_timer(25))
+        self.pomodoro_button = tk.Button(frame_mode_buttons, text="Pomodoro", command=lambda:self.set_timer(self.pomodoro_time.get()))
         self.pomodoro_button.pack(side="left", padx=5)
-        self.short_break_button = tk.Button(frame_mode_buttons, text="Short Break", command=lambda: self.set_timer(5))
+        self.short_break_button = tk.Button(frame_mode_buttons, text="Short Break", command=lambda: self.set_timer(self.short_break_time.get()))
         self.short_break_button.pack(side="left", padx=5)
-        self.long_break_button = tk.Button(frame_mode_buttons, text="Long Break", command=lambda: self.set_timer(15))
+        self.long_break_button = tk.Button(frame_mode_buttons, text="Long Break", command=lambda: self.set_timer(self.long_break_time.get()))
         self.long_break_button.pack(side="left", padx=5)
         
         self.label = tk.Label(self.window, text="Time remaining:",font=("Helvetica", 14))
@@ -142,43 +152,34 @@ class EditPomodoroTimer:
         top.iconbitmap('./images/logo.ico')
         top.title("Edit Pomodoro Timer")
         top.geometry("500x200+460+350")
-        custom_timers = False
-        print("custom_timers: ",custom_timers)
-        if custom_timers == False:
-            self.tomato_default_values()
-        else:
-            self.tomato_custom_values()
-            
+        
+        #Initialize variables with default values or values from the config file
+        self.config = ConfigParser()
+        self.config.read("./settings/config.ini")
+        self.pomodoro_time = tk.StringVar(value=self.config.get("Settings", "pomodoro_time", fallback="25"))
+        self.short_break_time = tk.StringVar(value=self.config.get("Settings", "short_break_time", fallback="5"))
+        self.long_break_time = tk.StringVar(value=self.config.get("Settings", "long_break_time", fallback="15"))
+        
         self.create_widgets(top)
-        
-    def tomato_default_values(self):
-        self.pomodoro_time = tk.StringVar(value="25")
-        self.short_break_time = tk.StringVar(value="5")
-        self.long_break_time = tk.StringVar(value="15")
-        
-    def tomato_custom_values(self):
-        self.pomodoro_time = tk.StringVar(value="0")
-        self.short_break_time = tk.StringVar(value="0")
-        self.long_break_time = tk.StringVar(value="0")    
         
     def create_widgets(self, parent):
         pomodoro_label = tk.Label(parent, text="Pomodoro", font=("Helvetica", 12))
         pomodoro_label.pack()
 
-        pomodoro_entry = tk.Entry(parent, textvariable=self.pomodoro_time)  
+        pomodoro_entry = tk.Entry(parent, textvariable=self.pomodoro_time)
         pomodoro_entry.pack(padx=5, pady=5)
         pomodoro_entry.focus()
 
         short_break_label = tk.Label(parent, text="Short Break", font=("Helvetica", 12))
         short_break_label.pack()
 
-        short_break_entry = tk.Entry(parent, textvariable=self.short_break_time)  
+        short_break_entry = tk.Entry(parent, textvariable=self.short_break_time)
         short_break_entry.pack(padx=5, pady=5)
 
         long_break_label = tk.Label(parent, text="Long Break", font=("Helvetica", 12))
         long_break_label.pack()
 
-        long_break_entry = tk.Entry(parent, textvariable=self.long_break_time) 
+        long_break_entry = tk.Entry(parent, textvariable=self.long_break_time)
         long_break_entry.pack(padx=5, pady=5)
 
         save_button = tk.Button(parent, text="Save", command=self.save_values)
@@ -189,17 +190,18 @@ class EditPomodoroTimer:
         self.window.destroy()  # Close the Toplevel window
     
     def save_values(self):
-        #self.update(self.pomodoro_time.get(), self.short_break_time.get(), self.long_break_time.get())
-        #self.update_values(self.pomodoro_time.get(), self.short_break_time.get(), self.long_break_time.get())
-        #self.close_window()
-        #file = filedialog.asksaveasFile()
-        pass
-        
-    def update_values(self,pomodoro_time, short_break_time, long_break_time):
-        self.pomodoro_time.set(self.pomodoro_time.get())
-        self.short_break_time.set(self.short_break_time.get())
-        self.long_break_time.set(self.long_break_time.get())
-                
+        # Save values to the configuration file with a section header
+        self.config["Settings"] = {
+            "pomodoro_time": self.pomodoro_time.get(),
+            "short_break_time": self.short_break_time.get(),
+            "long_break_time": self.long_break_time.get(),
+        }
+    
+        # Save the configuration to the file
+        with open("./settings/config.ini", "w") as config_file:
+            self.config.write(config_file)
+        self.close_window()
+                            
     def close_window(self):
         self.frame.master.deiconify()
         self.frame.master.destroy()
