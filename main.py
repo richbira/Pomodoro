@@ -2,6 +2,7 @@ from playsound import playsound
 import tkinter as tk
 import time
 from playsound import playsound
+from tkinter import *
 
 class PomodoroTimer:
     def __init__(self):
@@ -13,6 +14,9 @@ class PomodoroTimer:
         self.window.resizable(False, False)
         self.create_menu()
         self.create_widgets()
+        global custom_timers
+        custom_timers = None
+        print("MAIN custom_timers: ",custom_timers)
 
     def create_menu(self):
         menu_bar = tk.Menu(self.window)
@@ -23,7 +27,6 @@ class PomodoroTimer:
         file_menu.add_command(label="Edit Pomodoro Timer", command=self.open_edit_pomodoro)
         file_menu.add_command(label="What is pomodoro?", command=self.open_what_is_pomodoro)
         file_menu.add_command(label="How to use pomodoro timer", command=self.open_how_pomodoro)
-
 
     def create_widgets(self):
         self.entry = tk.Entry(self.window)
@@ -72,7 +75,7 @@ class PomodoroTimer:
         WhatIsPomodoro(self.window)
         
     def open_edit_pomodoro(self):
-        EditPomodoroTimer(self.window)
+        editPomodoroTimer = EditPomodoroTimer(self.update)
         
     def open_how_pomodoro(self):
         HowToPomodoro(self.window)
@@ -114,6 +117,10 @@ class PomodoroTimer:
         self.short_break_button.config(state=tk.DISABLED)
         self.start_button.config(state=tk.DISABLED)
 
+    def update(self, pomodoro_time, short_break_time, long_break_time):
+        print("update function called")
+        print("Tomato timer: ",pomodoro_time,"short break: ", short_break_time,"long break ", long_break_time)
+    
     def run(self):
         self.window.mainloop()
  
@@ -128,71 +135,74 @@ class WhatIsPomodoro:
         self.text_box.pack()
         
 class EditPomodoroTimer:
-    def __init__(self, parent):
-        self.window = tk.Toplevel(parent)
-        self.window.iconbitmap('./images/logo.ico')
-        self.window.title("Edit Pomodoro Timer")
-        self.window.geometry("500x200+460+350")
+    def __init__(self, update):
+        top = tk.Toplevel()
+        self.frame = Frame(top)
+        self.update = update
+        top.iconbitmap('./images/logo.ico')
+        top.title("Edit Pomodoro Timer")
+        top.geometry("500x200+460+350")
+        custom_timers = False
+        print("custom_timers: ",custom_timers)
+        if custom_timers == False:
+            self.tomato_default_values()
+        else:
+            self.tomato_custom_values()
+            
+        self.create_widgets(top)
         
-        # Initialize StringVar with default values
+    def tomato_default_values(self):
         self.pomodoro_time = tk.StringVar(value="25")
         self.short_break_time = tk.StringVar(value="5")
         self.long_break_time = tk.StringVar(value="15")
         
-        self.create_widgets(parent)
+    def tomato_custom_values(self):
+        self.pomodoro_time = tk.StringVar(value="0")
+        self.short_break_time = tk.StringVar(value="0")
+        self.long_break_time = tk.StringVar(value="0")    
         
     def create_widgets(self, parent):
-        pomodoro_label = tk.Label(self.window, text="Pomodoro", font=("Helvetica", 12))
+        pomodoro_label = tk.Label(parent, text="Pomodoro", font=("Helvetica", 12))
         pomodoro_label.pack()
-        
-        pomodoro_time = tk.StringVar()
-        pomodoro_time = 25
-        pomodoro_entry = tk.Entry(self.window,textvariable=pomodoro_time)
-        pomodoro_entry.insert(0, pomodoro_time)
+
+        pomodoro_entry = tk.Entry(parent, textvariable=self.pomodoro_time)  
         pomodoro_entry.pack(padx=5, pady=5)
         pomodoro_entry.focus()
-        
-        short_break_label = tk.Label(self.window, text="Short Break", font=("Helvetica", 12))
+
+        short_break_label = tk.Label(parent, text="Short Break", font=("Helvetica", 12))
         short_break_label.pack()
-        
-        short_break_time = tk.StringVar()
-        short_break_time = 5
-        short_break_entry = tk.Entry(self.window,textvariable=short_break_time)
-        short_break_entry.insert(0, short_break_time)
+
+        short_break_entry = tk.Entry(parent, textvariable=self.short_break_time)  
         short_break_entry.pack(padx=5, pady=5)
-        
-        long_break_label = tk.Label(self.window, text="Long Break", font=("Helvetica", 12))
+
+        long_break_label = tk.Label(parent, text="Long Break", font=("Helvetica", 12))
         long_break_label.pack()
-        
-        long_break_time = tk.StringVar()
-        long_break_entry = tk.Entry(self.window,textvariable=long_break_time)
-        long_break_time = 15
-        long_break_entry.insert(0, long_break_time)
+
+        long_break_entry = tk.Entry(parent, textvariable=self.long_break_time) 
         long_break_entry.pack(padx=5, pady=5)
-        
-       #save_button = tk.Button(self.window, text="Save", command=lambda: self.save_values(parent))
-        save_button = tk.Button(self.window, text="Save", command=self.save_values)
+
+        save_button = tk.Button(parent, text="Save", command=self.save_values)
         save_button.pack()
 
     def close_window(self, parent):
         parent.deiconify()  # Show the main window
         self.window.destroy()  # Close the Toplevel window
     
-    
     def save_values(self):
-        # Retrieve the entered values
-        pomodoro_value = int(self.pomodoro_time.get())
-        short_break_value = int(self.short_break_time.get())
-        long_break_value = int(self.long_break_time.get())
-
-        # You can use these values as needed (e.g., save to a file or update settings)
-        print("Pomodoro:", pomodoro_value)
-        print("Short Break:", short_break_value)
-        print("Long Break:", long_break_value)
-
-        # Close the Toplevel window
-        self.window.deiconify()
-        self.window.destroy()
+        #self.update(self.pomodoro_time.get(), self.short_break_time.get(), self.long_break_time.get())
+        #self.update_values(self.pomodoro_time.get(), self.short_break_time.get(), self.long_break_time.get())
+        #self.close_window()
+        #file = filedialog.asksaveasFile()
+        pass
+        
+    def update_values(self,pomodoro_time, short_break_time, long_break_time):
+        self.pomodoro_time.set(self.pomodoro_time.get())
+        self.short_break_time.set(self.short_break_time.get())
+        self.long_break_time.set(self.long_break_time.get())
+                
+    def close_window(self):
+        self.frame.master.deiconify()
+        self.frame.master.destroy()
         
 class HowToPomodoro:
     def __init__(self, parent):
@@ -213,6 +223,6 @@ class HowToPomodoro:
 
 if __name__ == "__main__":
     timer = PomodoroTimer()
-    timer.run()
+    timer.window.mainloop()
     
     
