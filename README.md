@@ -1,49 +1,53 @@
-# Pomodoro Timer!
-How to become more productive
+# Pomodoro Timer GUI App 🍅
+How to become more productive!
 
-# Run Locally
+Welcome to the Pomodoro (Tomato) Timer GUI app! This application is designed to help you become more productive by using the Pomodoro technique. The Pomodoro technique involves working on a task for 25 minutes (one "Pomodoro") and then taking a short 5-minute break. After completing four Pomodoros, take a longer break of 15 minutes. This cycle helps improve focus and productivity.
+
+## Getting Started
+Clone the Repository
+
 ```bash
-  git clone https://github.com/richbira/Pomodoro.git
-
+git clone https://github.com/richbira/Pomodoro.git
 ```
 
-You can now open the Tomato Timer on "dist" folder and open the main.exe!
+Run the Application
+Navigate to the "dist" folder and open the main.exe file.
 
-Or
+Install Playsound
 
-Install Playsound:
 ```bash
-  pip install playsound
-
+pip install playsound
 ```
 
-open cmd and run:
-```bash
-  python main.py
+Open the command prompt and run:
 
+```bash
+pip install playsound
 ```
 
 # How to use Pomodoro/ Tomato timers
-- Decide task to be done set timers to 25 minutes for one "Pomodoro"
-- Work on task until timer is complete
-- Take a 5 minutes short break
-- After four "Pomodoro" take a long break
-- Repeat to step 1
+1) Decide on the task you want to accomplish.
+2) Set the timer for 25 minutes (one Pomodoro) and start working on the task.
+3) When the timer completes, take a 5-minute short break.
+4) After completing four Pomodoros, take a 15-minute long break.
+5) Repeat the process from step 1.
 
 - Final Result: You have worked for 100 minutes and took 15 minutes break!
 
 PS: There is also a motivational quote that will help you on being productive! :)
 
+## Technology Used
+This application is developed using the Python programming language and the tkinter library, which provides a Python interface to Tcl/Tk for building graphical user interfaces.
 
-Language used : Python
-Library tkinter — Python interface to Tcl/Tk
 
-# Currently in development!
+## Want to contribute?
+Contributions
+This project is currently in development, and contributions are highly encouraged! If you encounter any bugs, have feature requests, or want to contribute in any way, feel free to:
 
-#Want to contribute?
-Contributions are always welcome!
-As I am currently in the process of learning Python, I anticipate encountering challenges while developing the app; however, I am open to and welcome all suggestions.
+Open an issue
+Submit a pull request
+As the developer is learning Python, your feedback and suggestions are invaluable. Let's make this Tomato Timer app even better together!
 
-Feel free to open an issue if you found a bug or want to recommend a feature. Also, PRs are welcome.
+Happy coding and stay productive! 🍅🕒
 
 
