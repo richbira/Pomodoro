@@ -2,19 +2,21 @@ import configparser
 from playsound import playsound
 import tkinter as tk
 import time
-from playsound import playsound
 from tkinter import *
 from configparser import ConfigParser
 
+
+
 class PomodoroTimer:
+    global logo_path
+    logo_path = "./images/logo.ico"
+    
     def __init__(self):
         self.timer_running = False
-        self.config = ConfigParser()
-        self.config.read("config.ini")  # Load configuration settings
         self.window = tk.Tk()
         self.window.title("Tomato Timer")
+        self.window.iconbitmap(logo_path)
         self.window.geometry("500x250+660+300")
-        self.window.iconbitmap('./images/logo.ico')
         self.window.resizable(False, False)        
         self.create_menu()
         self.get_value_from_file()
@@ -22,7 +24,7 @@ class PomodoroTimer:
         
     def get_value_from_file(self):
         self.config = ConfigParser()
-        self.config.read("settings/config.ini")
+        self.config.read("./settings/config.ini")
         self.pomodoro_time = tk.StringVar(value=self.config.get("Settings", "pomodoro_time", fallback="25"))
         self.short_break_time = tk.StringVar(value=self.config.get("Settings", "short_break_time", fallback="5"))
         self.long_break_time = tk.StringVar(value=self.config.get("Settings", "long_break_time", fallback="15"))
@@ -55,17 +57,14 @@ class PomodoroTimer:
         self.text_box.insert(tk.END, "You don’t have to be great to start, but you have to start to be great.")
         self.text_box.pack()
         
-        play_photo = tk.PhotoImage(file = "./images/play.png")
-        pause_photo = tk.PhotoImage(file = "./images/pause.png")
-        
-        self.play_photo_ref = play_photo
-        self.stop_photo_ref = pause_photo
-                
+        self.play_photo = tk.PhotoImage(file = "./images/play.png")
+        self.pause_photo = tk.PhotoImage(file = "./images/pause.png")
+                        
         frame_buttons_time = tk.Frame(self.window,padx=10, pady=10, height=100, width=100)
         frame_buttons_time.pack()
-        self.start_button = tk.Button(frame_buttons_time, text="Start", command=self.start_timer,image=play_photo)
+        self.start_button = tk.Button(frame_buttons_time, text="Start", command=self.start_timer,image=self.play_photo)
         self.start_button.pack(side="left", padx=5)
-        self.stop_button = tk.Button(frame_buttons_time, text="Stop", command=self.stop_timer,image=pause_photo)
+        self.stop_button = tk.Button(frame_buttons_time, text="Stop", command=self.stop_timer,image=self.pause_photo)
         self.stop_button.pack(side="left", padx=5)
         
     def pomodoro_button_clicked(self):
@@ -86,12 +85,6 @@ class PomodoroTimer:
     def set_timer(self, minutes):
         self.entry.delete(0, tk.END)
         self.entry.insert(0, minutes)
-
-    def start_timer(self):
-        minutes = int(self.entry.get())
-        seconds = minutes * 60
-        self.disable_buttons()
-        self.timer_running = True
         
     def open_what_is_pomodoro(self):
         WhatIsPomodoro(self.window)
@@ -149,18 +142,23 @@ class WhatIsPomodoro:
     def __init__(self, parent):
         self.window = tk.Toplevel(parent)
         self.window.title("What is Pomodoro?")
-        self.window.iconbitmap('./images/logo.ico')
+        self.window.iconbitmap(logo_path)
+        self.window.resizable(False, False)
         # Add content to the new window as needed
-        self.text_box = tk.Text(self.window, height=10, width=50)
-        self.text_box.insert(tk.END, "The Pomodoro Technique is a time management method that uses a timer to break work into intervals, traditionally 25 minutes in length, separated by short breaks. It is named after the tomato-shaped kitchen timer that was used by the creator of this technique. The technique aims to improve productivity by reducing distractions and promoting focus and concentration.")
-        self.text_box.pack()
+        descrpition_text = """ 
+        The Pomodoro Technique is a time management method that uses a timer to break work into intervals, traditionally 25 minutes in length, separated by short breaks.\n
+        The technique aims to improve productivity by reducing distractions and promoting focus and concentration.
+        """
+        what_is_pom_label = tk.Label(self.window, text=descrpition_text)
+        what_is_pom_label.pack()
+        
         
 class EditPomodoroTimer:
     def __init__(self, update):
         top = tk.Toplevel()
         self.frame = Frame(top)
         self.update = update
-        top.iconbitmap('./images/logo.ico')
+        top.iconbitmap(logo_path)
         top.title("Edit Pomodoro Timer")
         top.geometry("500x200+460+350")
         
@@ -169,7 +167,7 @@ class EditPomodoroTimer:
         
     def get_value_from_file(self):
         self.config = ConfigParser()
-        self.config.read("settings/config.ini")
+        self.config.read("./settings/config.ini")
         self.pomodoro_time = tk.StringVar(value=self.config.get("Settings", "pomodoro_time", fallback="25"))
         self.short_break_time = tk.StringVar(value=self.config.get("Settings", "short_break_time", fallback="5"))
         self.long_break_time = tk.StringVar(value=self.config.get("Settings", "long_break_time", fallback="15"))
@@ -224,18 +222,18 @@ class HowToPomodoro:
     def __init__(self, parent):
         self.window = tk.Toplevel(parent)
         self.window.title("Edit Pomodoro Timer")
-        self.window.iconbitmap('./images/logo.ico')
-        self.text_box = tk.Text(self.window, height=10, width=50)
-        text = """
-        - Decide task to be done set timers to 25 minutes for one "Pomodoro" \n
-        - Work on task until timer is complete \n
-        - Take a 5 minutes short break \n
-        - After four "Pomodoro" take a long break \n
-        - Repeat to step 1 \n
+        self.window.iconbitmap(logo_path)
+        self.window.resizable(False, False) 
+        text_how_to = """
+        1) Decide task to be done set timers to 25 minutes for one "Pomodoro" \n
+        2) Work on task until timer is complete \n
+        3) Take a 5 minutes short break \n
+        4) After four "Pomodoro" take a long break \n
+        5) Repeat to step 1 \n
          
         Final Result: You have worked for 100 minutes and took 15 minutes break"""
-        self.text_box.insert(tk.END, text)
-        self.text_box.pack()
+        how_to_pomodoro_label = tk.Label(self.window, text=text_how_to)
+        how_to_pomodoro_label.pack()
 
 if __name__ == "__main__":
     timer = PomodoroTimer()
