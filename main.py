@@ -3,21 +3,20 @@ import tkinter as tk
 import time
 from tkinter import *
 from configparser import ConfigParser
+import os
 
-class PomodoroTimer:
-    global logo_path
-    global seconds
-    global pomodoro_counter 
-    logo_path = r'./images/logo.ico'
-    
+class PomodoroTimer:  
     def __init__(self):
         self.timer_running = False
         self.window = tk.Tk()
         self.window.title("Tomato Timer")
+        global logo_path
+        logo_path = os.path.join('images', 'logo.ico')
         self.window.wm_iconbitmap(bitmap=logo_path)
-        self.window.geometry("500x250+660+300")
-        self.window.resizable(False, False)       
+        self.seconds = 0
         self.pomodoro_counter = 0
+        self.window.geometry("500x250+660+300")
+        self.window.resizable(False, False)
         self.pomodoro_started = False
         self.create_menu()
         self.get_value_from_file()
@@ -101,23 +100,22 @@ class PomodoroTimer:
     def start_timer(self):
         self.disable_buttons()
         self.timer_running = True
-        
-        while self.seconds > 0 and self.timer_running:
+        self.update_timer_label()
+
+    def update_timer_label(self):
+        if self.seconds > 0 and self.timer_running:
             self.label.config(text=f"Time remaining: {self.seconds // 60}:{self.seconds % 60:02d} minutes", font=("Helvetica", 14))
-            self.label.update()
-            time.sleep(1)
+            self.label.after(1000, self.update_timer_label)
             self.seconds -= 1
+        
+        if self.seconds == 0:
+            self.label.config(text="Time finished!")
+            playsound('./audio/notification.mp3')
+            self.enable_buttons()
+            if self.pomodoro_started:
+                self.pomodoro_counter += 1
+                self.pomodoro_counter_label.config(text=f"Pomodoro completed: {self.pomodoro_counter}", font=("Helvetica", 8))
 
-            if self.seconds == 0:
-                self.label.config(text="Time finished!")
-                playsound('./audio/notification.mp3')
-                self.enable_buttons()
-                if self.pomodoro_started == True:
-                    self.pomodoro_counter += 1
-                    self.pomodoro_counter_label.config(text=f"Pomodoro completed: {self.pomodoro_counter}", font=("Helvetica", 8))  
-                break
-
-        self.enable_buttons()
 
     def stop_timer(self):
         self.enable_buttons()
@@ -198,10 +196,10 @@ class EditPomodoroTimer:
         save_button = tk.Button(parent, text="Save", command=self.save_values)
         save_button.pack()
 
-    def close_window(self, parent):
-        parent.deiconify()  # Show the main window
-        self.window.destroy()  # Close the Toplevel window
-    
+    def close_window(self):
+        self.frame.master.deiconify()
+        self.frame.master.destroy()
+
     def save_values(self):
         # Save values to the configuration file with a section header
         self.config["Settings"] = {
