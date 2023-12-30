@@ -1,23 +1,24 @@
-import configparser
 from playsound import playsound
 import tkinter as tk
 import time
 from tkinter import *
 from configparser import ConfigParser
 
-
-
 class PomodoroTimer:
     global logo_path
-    logo_path = "./images/logo.ico"
+    global seconds
+    global pomodoro_counter 
+    logo_path = r'./images/logo.ico'
     
     def __init__(self):
         self.timer_running = False
         self.window = tk.Tk()
         self.window.title("Tomato Timer")
-        self.window.iconbitmap(logo_path)
+        self.window.wm_iconbitmap(bitmap=logo_path)
         self.window.geometry("500x250+660+300")
-        self.window.resizable(False, False)        
+        self.window.resizable(False, False)       
+        self.pomodoro_counter = 0
+        self.pomodoro_started = False
         self.create_menu()
         self.get_value_from_file()
         self.create_widgets()
@@ -39,8 +40,7 @@ class PomodoroTimer:
         file_menu.add_command(label="What is pomodoro?", command=self.open_what_is_pomodoro)
         file_menu.add_command(label="How to use pomodoro timer", command=self.open_how_pomodoro)
 
-    def create_widgets(self):
-        self.entry = tk.Entry(self.window)        
+    def create_widgets(self):     
         frame_mode_buttons = tk.Frame(self.window,padx=10, pady=10)
         frame_mode_buttons.pack()
         
@@ -67,9 +67,13 @@ class PomodoroTimer:
         self.stop_button = tk.Button(frame_buttons_time, text="Stop", command=self.stop_timer,image=self.pause_photo)
         self.stop_button.pack(side="left", padx=5)
         
+        self.pomodoro_counter_label = tk.Label(self.window, text=f"Pomodoro completed: {self.pomodoro_counter}", font=("Helvetica", 8))
+        self.pomodoro_counter_label.pack()
+        
     def pomodoro_button_clicked(self):
         pomodoro_value = self.pomodoro_time.get()
         self.set_timer(pomodoro_value)
+        self.pomodoro_started = True
         self.label.config(text=f"Time remaining: {pomodoro_value} minutes", font=("Helvetica", 14))      
         
     def short_break_button_clicked(self):
@@ -83,8 +87,7 @@ class PomodoroTimer:
         self.label.config(text=f"Time remaining: {long_break_value} minutes", font=("Helvetica", 14))
 
     def set_timer(self, minutes):
-        self.entry.delete(0, tk.END)
-        self.entry.insert(0, minutes)
+        self.seconds = int(minutes) * 60
         
     def open_what_is_pomodoro(self):
         WhatIsPomodoro(self.window)
@@ -96,21 +99,22 @@ class PomodoroTimer:
         HowToPomodoro(self.window)
         
     def start_timer(self):
-        minutes = int(self.entry.get())
-        seconds = minutes * 60
         self.disable_buttons()
         self.timer_running = True
         
-        while seconds >= 0 and self.timer_running:
-            self.label.config(text=f"Time remaining: {seconds // 60}:{seconds % 60:02d} minutes", font=("Helvetica", 14))
+        while self.seconds > 0 and self.timer_running:
+            self.label.config(text=f"Time remaining: {self.seconds // 60}:{self.seconds % 60:02d} minutes", font=("Helvetica", 14))
             self.label.update()
             time.sleep(1)
-            seconds -= 1
+            self.seconds -= 1
 
-            if seconds == 0:
-                self.enable_buttons()
+            if self.seconds == 0:
                 self.label.config(text="Time finished!")
                 playsound('./audio/notification.mp3')
+                self.enable_buttons()
+                if self.pomodoro_started == True:
+                    self.pomodoro_counter += 1
+                    self.pomodoro_counter_label.config(text=f"Pomodoro completed: {self.pomodoro_counter}", font=("Helvetica", 8))  
                 break
 
         self.enable_buttons()
@@ -142,7 +146,7 @@ class WhatIsPomodoro:
     def __init__(self, parent):
         self.window = tk.Toplevel(parent)
         self.window.title("What is Pomodoro?")
-        self.window.iconbitmap(logo_path)
+        self.window.wm_iconbitmap(bitmap=logo_path)
         self.window.resizable(False, False)
         # Add content to the new window as needed
         descrpition_text = """ 
@@ -151,14 +155,13 @@ class WhatIsPomodoro:
         """
         what_is_pom_label = tk.Label(self.window, text=descrpition_text)
         what_is_pom_label.pack()
-        
-        
+                
 class EditPomodoroTimer:
     def __init__(self, update):
         top = tk.Toplevel()
         self.frame = Frame(top)
         self.update = update
-        top.iconbitmap(logo_path)
+        top.wm_iconbitmap(bitmap=logo_path)
         top.title("Edit Pomodoro Timer")
         top.geometry("500x200+460+350")
         
@@ -222,7 +225,7 @@ class HowToPomodoro:
     def __init__(self, parent):
         self.window = tk.Toplevel(parent)
         self.window.title("Edit Pomodoro Timer")
-        self.window.iconbitmap(logo_path)
+        self.window.wm_iconbitmap(bitmap=logo_path)
         self.window.resizable(False, False) 
         text_how_to = """
         1) Decide task to be done set timers to 25 minutes for one "Pomodoro" \n
