@@ -1,3 +1,4 @@
+import sys
 from playsound import playsound
 import tkinter as tk
 import time
@@ -5,13 +6,13 @@ from tkinter import *
 from configparser import ConfigParser
 import os
 
-class PomodoroTimer:  
+class PomodoroTimer:      
     def __init__(self):
         self.timer_running = False
         self.window = tk.Tk()
         self.window.title("Tomato Timer")
         global logo_path
-        logo_path = os.path.join('images', 'logo.ico')
+        logo_path = PomodoroTimer.resource_path(os.path.join('images', 'logo.ico'))
         self.window.wm_iconbitmap(bitmap=logo_path)
         self.seconds = 0
         self.pomodoro_counter = 0
@@ -23,6 +24,16 @@ class PomodoroTimer:
         self.create_widgets()
         self.disable_timer_buttons()
         
+    @staticmethod
+    def resource_path(relative_path):
+        """ Get absolute path to resource, works for dev and for PyInstaller """
+        try:
+            # PyInstaller creates a temp folder and stores path in _MEIPASS
+            base_path = sys._MEIPASS
+        except Exception:
+            base_path = os.path.abspath(".")
+        return os.path.join(base_path, relative_path)
+    
     def get_value_from_file(self):
         self.config = ConfigParser()
         self.config.read("./settings/config.ini")
@@ -57,9 +68,9 @@ class PomodoroTimer:
         self.text_box.insert(tk.END, "You don’t have to be great to start, but you have to start to be great.")
         self.text_box.pack()
         
-        self.play_photo = tk.PhotoImage(file = "./images/play.png")
-        self.pause_photo = tk.PhotoImage(file = "./images/pause.png")
-        self.reload_photo = tk.PhotoImage(file = "./images/reload.png")
+        self.play_photo = tk.PhotoImage(file = PomodoroTimer.resource_path(os.path.join('images', 'play.png')))
+        self.pause_photo = tk.PhotoImage(file = PomodoroTimer.resource_path(os.path.join('images', 'pause.png')))
+        self.reload_photo = tk.PhotoImage(file = PomodoroTimer.resource_path(os.path.join('images', 'reload.png')))
                         
         frame_buttons_time = tk.Frame(self.window,padx=10, pady=10, height=100, width=100)
         frame_buttons_time.pack()
@@ -276,5 +287,5 @@ class HowToPomodoro:
 if __name__ == "__main__":
     timer = PomodoroTimer()
     timer.window.mainloop()
-    
+
     
