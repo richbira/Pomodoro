@@ -17,10 +17,11 @@ class PomodoroTimer:
         self.pomodoro_counter = 0
         self.window.geometry("500x250+660+300")
         self.window.resizable(False, False)
-        self.pomodoro_started = False
+        self.mode_selected = ""
         self.create_menu()
         self.get_value_from_file()
         self.create_widgets()
+        self.disable_timer_buttons()
         
     def get_value_from_file(self):
         self.config = ConfigParser()
@@ -58,6 +59,7 @@ class PomodoroTimer:
         
         self.play_photo = tk.PhotoImage(file = "./images/play.png")
         self.pause_photo = tk.PhotoImage(file = "./images/pause.png")
+        self.reload_photo = tk.PhotoImage(file = "./images/reload.png")
                         
         frame_buttons_time = tk.Frame(self.window,padx=10, pady=10, height=100, width=100)
         frame_buttons_time.pack()
@@ -65,6 +67,8 @@ class PomodoroTimer:
         self.start_button.pack(side="left", padx=5)
         self.stop_button = tk.Button(frame_buttons_time, text="Stop", command=self.stop_timer,image=self.pause_photo)
         self.stop_button.pack(side="left", padx=5)
+        self.reload = tk.Button(frame_buttons_time, text="Stop", command=self.reload_timer,image=self.reload_photo)
+        self.reload.pack(side="left", padx=5)
         
         self.pomodoro_counter_label = tk.Label(self.window, text=f"Pomodoro completed: {self.pomodoro_counter}", font=("Helvetica", 8))
         self.pomodoro_counter_label.pack()
@@ -72,18 +76,23 @@ class PomodoroTimer:
     def pomodoro_button_clicked(self):
         pomodoro_value = self.pomodoro_time.get()
         self.set_timer(pomodoro_value)
-        self.pomodoro_started = True
-        self.label.config(text=f"Time remaining: {pomodoro_value} minutes", font=("Helvetica", 14))      
+        self.mode_selected = "Pomodoro"
+        self.label.config(text=f"Time remaining: {pomodoro_value} minutes", font=("Helvetica", 14))
+        self.enable_timer_buttons()      
         
     def short_break_button_clicked(self):
         short_break_value = self.short_break_time.get()
         self.set_timer(short_break_value)
+        self.mode_selected = "short_break"
         self.label.config(text=f"Time remaining: {short_break_value} minutes", font=("Helvetica", 14))
+        self.enable_timer_buttons()
 
     def long_break_button_clicked(self):
         long_break_value = self.long_break_time.get()
         self.set_timer(long_break_value)
+        self.mode_selected = "long_break"
         self.label.config(text=f"Time remaining: {long_break_value} minutes", font=("Helvetica", 14))
+        self.enable_timer_buttons()
 
     def set_timer(self, minutes):
         self.seconds = int(minutes) * 60
@@ -101,26 +110,44 @@ class PomodoroTimer:
         self.disable_buttons()
         self.timer_running = True
         self.update_timer_label()
+        self.stop_button.config(state=tk.NORMAL)
 
-    def update_timer_label(self):
-        if self.seconds > 0 and self.timer_running:
-            self.label.config(text=f"Time remaining: {self.seconds // 60}:{self.seconds % 60:02d} minutes", font=("Helvetica", 14))
-            self.label.after(1000, self.update_timer_label)
-            self.seconds -= 1
+    def update_timer_label(self, start_time=None):
+        if start_time is None:
+            start_time = time.time()
+
+        elapsed_time = time.time() - start_time
+        remaining_time = max(0, self.seconds - int(elapsed_time))
+
+        if remaining_time > 0 and self.timer_running:
+            minutes = remaining_time // 60
+            seconds = remaining_time % 60
+
+            self.label.config(text=f"Time remaining: {minutes}:{seconds:02d} minutes", font=("Helvetica", 14))
+            self.label.after(1000, lambda: self.update_timer_label(start_time))
         
-        if self.seconds == 0:
+        if remaining_time  == 0:
             self.label.config(text="Time finished!")
-            playsound('./audio/notification.mp3')
-            self.enable_buttons()
-            if self.pomodoro_started:
+            if self.mode_selected == "Pomodoro":
                 self.pomodoro_counter += 1
                 self.pomodoro_counter_label.config(text=f"Pomodoro completed: {self.pomodoro_counter}", font=("Helvetica", 8))
-
+            playsound('./audio/notification.mp3')
+            self.enable_buttons()
 
     def stop_timer(self):
         self.enable_buttons()
         self.timer_running = False
-
+        self.stop_button.config(state=tk.DISABLED)
+        
+    def reload_timer(self):
+        self.stop_timer()
+        if self.mode_selected == "Pomodoro":
+            self.pomodoro_button_clicked()
+        elif self.mode_selected == "short_break":
+            self.short_break_button_clicked()
+        elif self.mode_selected == "long_break":
+            self.long_break_button_clicked()
+        
     def enable_buttons(self):
         self.pomodoro_button.config(state=tk.NORMAL)
         self.long_break_button.config(state=tk.NORMAL)
@@ -133,6 +160,16 @@ class PomodoroTimer:
         self.long_break_button.config(state=tk.DISABLED)
         self.short_break_button.config(state=tk.DISABLED)
         self.start_button.config(state=tk.DISABLED)
+        
+    def disable_timer_buttons(self):
+        self.start_button.config(state=tk.DISABLED)
+        self.stop_button.config(state=tk.DISABLED)
+        self.reload.config(state=tk.DISABLED)
+        
+    def enable_timer_buttons(self):
+        self.start_button.config(state=tk.NORMAL)
+        self.stop_button.config(state=tk.NORMAL)
+        self.reload.config(state=tk.NORMAL)
 
     def update(self):
         self.get_value_from_file()
